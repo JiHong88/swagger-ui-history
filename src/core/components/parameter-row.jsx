@@ -10,6 +10,7 @@ export default class ParameterRow extends Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
     param: PropTypes.object.isRequired,
+    historyParam: PropTypes.object,
     rawParam: PropTypes.object.isRequired,
     getComponent: PropTypes.func.isRequired,
     fn: PropTypes.object.isRequired,
@@ -182,7 +183,7 @@ export default class ParameterRow extends Component {
   }
 
   render() {
-    let {param, rawParam, getComponent, getConfigs, isExecute, fn, onChangeConsumes, specSelectors, pathMethod, specPath, oas3Selectors} = this.props
+    let {param, rawParam, historyParam, getComponent, getConfigs, isExecute, fn, onChangeConsumes, specSelectors, pathMethod, specPath, oas3Selectors} = this.props
 
     let isOAS3 = specSelectors.isOAS3()
 
@@ -266,6 +267,14 @@ export default class ParameterRow extends Component {
       if (paramExample === undefined) {
         paramExample = param.get("x-example")
       }
+    }
+
+    // Force call onChange when there is historyParam
+    if (historyParam) {
+      setTimeout(()=>{
+        let { onChange, rawParam } = this.props
+        onChange(rawParam, value = historyParam, !!historyParam.isXml, true)
+      })
     }
 
     return (

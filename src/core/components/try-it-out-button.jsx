@@ -22,14 +22,17 @@ export default class TryItOutButton extends React.Component {
   }
 
   render() {
-    const { onTryoutClick, onCancelClick, onResetClick, enabled, hasUserEditedBody, isOAS3 } = this.props
+    const { onTryoutClick, onCancelClick, onClickHistory, onResetClick, enabled, hasUserEditedBody, isOAS3 } = this.props
 
     const showReset = isOAS3 && hasUserEditedBody
     return (
       <div className={showReset ? "try-out btn-group" : "try-out"}>
         {
-          enabled ? <button className="btn try-out__btn cancel" onClick={ onCancelClick }>Cancel</button>
-                  : <button className="btn try-out__btn" onClick={ onTryoutClick }>Try it out </button>
+          enabled ? <>
+            <button className="btn btn-history" onClick={ onClickHistory }>History</button>
+            <button className="btn try-out__btn cancel" onClick={ onCancelClick }>Cancel</button>
+          </>
+          : <button className="btn try-out__btn" onClick={ onTryoutClick }>Try it out </button>
 
         }
         {

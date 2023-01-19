@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import PropTypes from "prop-types"
 import { Map, List } from "immutable"
 import ImPropTypes from "react-immutable-proptypes"
+import { HistoryPopup } from "../../components/history"
 
 export default class Parameters extends Component {
 
@@ -10,6 +11,8 @@ export default class Parameters extends Component {
     this.state = {
       callbackVisible: false,
       parametersVisible: true,
+      historyPopup: false,
+      historyParams: {},
     }
   }
 
@@ -27,23 +30,30 @@ export default class Parameters extends Component {
     onTryoutClick: PropTypes.func,
     onResetClick: PropTypes.func,
     onCancelClick: PropTypes.func,
+    onHistoryClick: PropTypes.func,
     onChangeKey: PropTypes.array,
     pathMethod: PropTypes.array.isRequired,
     getConfigs: PropTypes.func.isRequired,
     specPath: ImPropTypes.list.isRequired,
+    tagId: PropTypes.string.isRequired
   }
 
 
   static defaultProps = {
     onTryoutClick: Function.prototype,
     onCancelClick: Function.prototype,
+    onHistoryClick: Function.prototype,
     tryItOutEnabled: false,
     allowTryItOut: true,
     onChangeKey: [],
     specPath: [],
   }
 
-  onChange = (param, value, isXml) => {
+  onChange = (param, value, isXml, isHistory) => {
+    if (!isHistory) {
+      this.state.historyParams[param.get('name')] = ''
+    }
+
     let {
       specActions: { changeParamByIdentity },
       onChangeKey,
@@ -89,6 +99,14 @@ export default class Parameters extends Component {
       specActions.clearRequest(...pathMethod)
       specActions.clearValidateParams(pathMethod)
     }
+  }
+
+  onToggleHistory=() => {
+    this.setState({ historyPopup: !this.state.historyPopup })
+  }
+
+  setHistoryParams=(data)=>{
+    this.setState({ historyParams: data.params })
   }
 
   render() {
@@ -162,6 +180,7 @@ export default class Parameters extends Component {
               hasUserEditedBody={oas3Selectors.hasUserEditedBody(...pathMethod)}
               enabled={tryItOutEnabled}
               onCancelClick={this.props.onCancelClick}
+              onClickHistory={this.onToggleHistory}
               onTryoutClick={onTryoutClick}
               onResetClick={() => onResetClick(pathMethod)}/>
           ) : null}
@@ -186,6 +205,7 @@ export default class Parameters extends Component {
                       getConfigs={getConfigs}
                       rawParam={parameter}
                       param={specSelectors.parameterWithMetaByIdentity(pathMethod, parameter)}
+                      historyParam={this.state.historyParams[parameter.get("name")]}
                       key={`${parameter.get("in")}.${parameter.get("name")}`}
                       onChange={this.onChange}
                       onChangeConsumes={this.onChangeConsumesWrapper}
@@ -272,6 +292,15 @@ export default class Parameters extends Component {
                 contentType={oas3Selectors.requestContentType(...pathMethod)} />
             </div>
           </div>
+        }
+        {
+          this.state.historyPopup && 
+          <HistoryPopup 
+            onClickClose={this.onToggleHistory} 
+            onClickItem={(data)=>this.setHistoryParams(data)}
+            tagId={this.props.tagId}
+            specActions={specActions}
+          />
         }
       </div>
     )

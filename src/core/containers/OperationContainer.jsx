@@ -246,6 +246,7 @@ export default class OperationContainer extends PureComponent {
         getComponent={ getComponent }
         getConfigs={ getConfigs }
         fn={fn}
+        tagId={["operations", tag, operationId].join("-")}
       />
     )
   }

@@ -6,6 +6,8 @@ import isString from "lodash/isString"
 import debounce from "lodash/debounce"
 import set from "lodash/set"
 import { paramToValue, isEmptyValue } from "core/utils"
+import Axios from "axios"
+import { v4 as uuidv4 }from "uuid"
 
 // Actions conform to FSA (flux-standard-actions)
 // {type: string,payload: Any|Error, meta: obj, error: bool}
@@ -505,6 +507,82 @@ export const execute = ( { path, method, ...extras }={} ) => (system) => {
     requestContentType,
     scheme,
     responseContentType
+  })
+}
+
+export const saveRequest = (req) =>
+  ({specActions, specSelectors, oas3Selectors }) => {
+    let { pathName, method, operation, tagId, name } = req
+
+    if (operation && operation.get("parameters")) {
+      operation.get("parameters")
+        .filter(param => param && param.get("allowEmptyValue") === true)
+        .forEach(param => {
+          if (specSelectors.parameterInclusionSettingFor([pathName, method], param.get("name"), param.get("in"))) {
+            req.parameters = req.parameters || {}
+            const paramValue = paramToValue(param, req.parameters)
+
+            // if the value is falsy or an empty Immutable iterable...
+            if(!paramValue || (paramValue && paramValue.size === 0)) {
+              // set it to empty string, so Swagger Client will treat it as
+              // present but empty.
+              req.parameters[param.get("name")] = ""
+            }
+          }
+        })
+    }
+
+    const SwaggerApi = Axios.create({
+      baseURL: "http://localhost:3000/swagger",
+      timeout: 180000,
+    });
+
+    const requestHeader = {}
+    if (oas3Selectors.requestContentType(pathName, method) === "multipart/form-data") {
+      requestHeader["Content-Type"] = "multipart/form-data";
+    }
+
+    SwaggerApi.post(
+        `/${tagId}`, 
+        { 
+          id: uuidv4(),
+          name: name,
+          scheme: req.scheme, 
+          pathName: req.pathName, 
+          method: req.method, 
+          params: req.parameters 
+        },
+        { 
+          headers: requestHeader 
+        }
+      ).then(() => {
+        specActions.setResponse(req.pathName, req.method, {})
+      })
+      .catch(err => {
+        if(!err.message) {
+          err.name = ""
+          err.message = "**Failed to save.**  \n**Possible Reasons:** \n  - CORS \n  - Network Failure \n  - URL scheme must be \"http\" or \"https\" for CORS request."
+        }
+        specActions.setResponse(req.pathName, req.method, {
+          error: true, err: serializeError(err)
+        })
+      })
+  }
+
+export const save = ( { path, method, ...extras }={} ) => (system) => {
+  let { specSelectors, specActions } = system
+  let spec = specSelectors.specJsonWithResolvedSubtrees().toJS()
+  let scheme = specSelectors.operationScheme(path, method)
+  let { requestContentType } = specSelectors.contentTypeValues([path, method]).toJS()
+  let isXml = /xml/i.test(requestContentType)
+  let parameters = specSelectors.parameterValues([path, method], isXml).toJS()
+
+  return specActions.saveRequest({
+    ...extras,
+    spec,
+    pathName: path,
+    method, parameters,
+    scheme,
   })
 }
 

@@ -5,9 +5,17 @@ import { getExtensions, sanitizeUrl, escapeDeepLinkPath } from "core/utils"
 import { safeBuildUrl } from "core/utils/url"
 import { Iterable, List } from "immutable"
 import ImPropTypes from "react-immutable-proptypes"
+import { ParamsSave, ParamsSavePopup } from "./history"
 
 
 export default class Operation extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.state = {
+      savePopup: false,
+    }
+  }
+
   static propTypes = {
     specPath: ImPropTypes.list.isRequired,
     operation: PropTypes.instanceOf(Iterable).isRequired,
@@ -19,6 +27,7 @@ export default class Operation extends PureComponent {
     onTryoutClick: PropTypes.func.isRequired,
     onResetClick: PropTypes.func.isRequired,
     onCancelClick: PropTypes.func.isRequired,
+    onHistoryClick: PropTypes.func.isRequired,
     onExecute: PropTypes.func.isRequired,
 
     getComponent: PropTypes.func.isRequired,
@@ -31,7 +40,8 @@ export default class Operation extends PureComponent {
     oas3Selectors: PropTypes.object.isRequired,
     layoutActions: PropTypes.object.isRequired,
     layoutSelectors: PropTypes.object.isRequired,
-    fn: PropTypes.object.isRequired
+    fn: PropTypes.object.isRequired,
+    tagId: PropTypes.string.isRequired
   }
 
   static defaultProps = {
@@ -51,6 +61,7 @@ export default class Operation extends PureComponent {
       onTryoutClick,
       onResetClick,
       onCancelClick,
+      onHistoryClick,
       onExecute,
       fn,
       getComponent,
@@ -158,6 +169,8 @@ export default class Operation extends PureComponent {
                   onCancelClick = { onCancelClick }
                   tryItOutEnabled = { tryItOutEnabled }
                   allowTryItOut={allowTryItOut}
+                  onHistoryClick = { onHistoryClick }
+                  tagId={ this.props.tagId }
 
                   fn={fn}
                   getComponent={ getComponent }
@@ -215,6 +228,24 @@ export default class Operation extends PureComponent {
                     method={ method }
                     onExecute={ onExecute }
                     disabled={executeInProgress}/>
+              }
+
+              { (!tryItOutEnabled || !response || !allowTryItOut) ? null :
+                  <ParamsSave
+                    onClickSave={ () => this.setState({savePopup: !this.state.savePopup}) }
+                    disabled={executeInProgress}/>
+              }
+
+              {
+                this.state.savePopup && 
+                <ParamsSavePopup
+                  tagId={ this.props.tagId }
+                  operation={ operation }
+                  specActions={ specActions }
+                  path={ path }
+                  method={ method }
+                  onExecute={ onExecute }
+                  onClickClose={ () => this.setState({savePopup: !this.state.savePopup}) }/>
               }
 
               { (!tryItOutEnabled || !response || !allowTryItOut) ? null :

@@ -1,0 +1,30 @@
+.history-popup {
+    .opblock-summary {
+        padding: .4rem;
+        border-bottom: none !important;
+        .opblock-summary-description {
+            padding: 4px;
+        }
+    }
+    .history-name {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+.btn {
+    &.btn-save {
+        border-radius: 0 !important;
+        background-color: transparent;
+        border-color: #7b60ff;
+        color: #7b60ff;
+        font-family: sans-serif;
+    }
+    &.btn-history{
+        background-color: transparent;
+        border-color: #7b60ff;
+        color: #7b60ff;
+        font-family: sans-serif;
+
+    }
+}
