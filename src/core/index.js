@@ -106,7 +106,9 @@ export default function SwaggerUI(opts) {
     syntaxHighlight: {
       activated: true,
       theme: "agate"
-    }
+    },
+
+    historyServerUrl: '',
   }
 
   let queryConfig = opts.queryConfigEnabled ? parseSearch() : {}

@@ -115,7 +115,7 @@ export default class Operation extends PureComponent {
     const OperationSummary = getComponent( "OperationSummary" )
     const Link = getComponent( "Link" )
 
-    const { showExtensions } = getConfigs()
+    const { showExtensions, historyServerUrl } = getConfigs()
 
     // Merge in Live Response
     if(responses && response && response.size > 0) {
@@ -230,7 +230,7 @@ export default class Operation extends PureComponent {
                     disabled={executeInProgress}/>
               }
 
-              { (!tryItOutEnabled || !response || !allowTryItOut) ? null :
+              { (!historyServerUrl || !tryItOutEnabled || !response || !allowTryItOut) ? null :
                   <ParamsSave
                     onClickSave={ () => this.setState({savePopup: !this.state.savePopup}) }
                     disabled={executeInProgress}/>
@@ -245,7 +245,8 @@ export default class Operation extends PureComponent {
                   path={ path }
                   method={ method }
                   onExecute={ onExecute }
-                  onClickClose={ () => this.setState({savePopup: !this.state.savePopup}) }/>
+                  onClickClose={ () => this.setState({savePopup: !this.state.savePopup}) }
+                  getConfigs={getConfigs}/>
               }
 
               { (!tryItOutEnabled || !response || !allowTryItOut) ? null :

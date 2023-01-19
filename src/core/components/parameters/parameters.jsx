@@ -138,7 +138,7 @@ export default class Parameters extends Component {
     const isExecute = tryItOutEnabled && allowTryItOut
     const isOAS3 = specSelectors.isOAS3()
 
-
+    const { historyServerUrl } = getConfigs()
     const requestBody = operation.get("requestBody")
 
     const groupedParametersArr = Object.values(parameters
@@ -182,7 +182,8 @@ export default class Parameters extends Component {
               onCancelClick={this.props.onCancelClick}
               onClickHistory={this.onToggleHistory}
               onTryoutClick={onTryoutClick}
-              onResetClick={() => onResetClick(pathMethod)}/>
+              onResetClick={() => onResetClick(pathMethod)}
+              showHistory={!!historyServerUrl}/>
           ) : null}
         </div>
         {this.state.parametersVisible ? <div className="parameters-container">
@@ -300,6 +301,7 @@ export default class Parameters extends Component {
             onClickItem={(data)=>this.setHistoryParams(data)}
             tagId={this.props.tagId}
             specActions={specActions}
+            getConfigs={getConfigs}
           />
         }
       </div>

@@ -7,7 +7,8 @@ export default class HistoryPopup extends React.Component {
     tagId: PropTypes.string.isRequired,
     specActions: PropTypes.object.isRequired,
     onClickClose: PropTypes.object.isRequired,
-    onClickItem: PropTypes.object.isRequired
+    onClickItem: PropTypes.object.isRequired,
+    getConfigs: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -18,10 +19,12 @@ export default class HistoryPopup extends React.Component {
   }
 
   async componentDidMount() {
-    const { specActions, tagId } = this.props
-    const stack = await specActions.getHistory({ tagId })
+    const { specActions, tagId, getConfigs } = this.props
+    const { historyServerUrl } = getConfigs()
+    const serverUrl = `${historyServerUrl}/${tagId}`
+
     this.setState({
-      stack: stack || []
+      stack: await specActions.getHistory({ serverUrl })
     })
   }
 

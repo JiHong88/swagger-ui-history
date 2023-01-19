@@ -512,7 +512,7 @@ export const execute = ( { path, method, ...extras }={} ) => (system) => {
 
 export const saveRequest = (req) =>
   ({specActions, specSelectors, oas3Selectors }) => {
-    let { pathName, method, operation, tagId, name } = req
+    let { pathName, method, operation, serverUrl, name } = req
 
     if (operation && operation.get("parameters")) {
       operation.get("parameters")
@@ -532,41 +532,36 @@ export const saveRequest = (req) =>
         })
     }
 
-    const SwaggerApi = Axios.create({
-      baseURL: "http://localhost:3000/swagger",
-      timeout: 180000,
-    });
-
     const requestHeader = {}
     if (oas3Selectors.requestContentType(pathName, method) === "multipart/form-data") {
       requestHeader["Content-Type"] = "multipart/form-data";
     }
 
-    SwaggerApi.post(
-        `/${tagId}`, 
-        { 
-          id: uuidv4(),
-          name: name,
-          scheme: req.scheme, 
-          pathName: req.pathName, 
-          method: req.method, 
-          params: req.parameters 
-        },
-        { 
-          headers: requestHeader 
-        }
-      ).then(() => {
-        specActions.setResponse(req.pathName, req.method, {})
+    Axios.post(
+      serverUrl, 
+      { 
+        id: uuidv4(),
+        name: name,
+        scheme: req.scheme, 
+        pathName: req.pathName, 
+        method: req.method, 
+        params: req.parameters 
+      },
+      { 
+        headers: requestHeader 
+      }
+    ).then(() => {
+      specActions.setResponse(req.pathName, req.method, {})
+    })
+    .catch(err => {
+      if(!err.message) {
+        err.name = ""
+        err.message = "**Failed to save.**  \n**Possible Reasons:** \n  - CORS \n  - Network Failure \n  - URL scheme must be \"http\" or \"https\" for CORS request."
+      }
+      specActions.setResponse(req.pathName, req.method, {
+        error: true, err: serializeError(err)
       })
-      .catch(err => {
-        if(!err.message) {
-          err.name = ""
-          err.message = "**Failed to save.**  \n**Possible Reasons:** \n  - CORS \n  - Network Failure \n  - URL scheme must be \"http\" or \"https\" for CORS request."
-        }
-        specActions.setResponse(req.pathName, req.method, {
-          error: true, err: serializeError(err)
-        })
-      })
+    })
   }
 
 export const save = ( { path, method, ...extras }={} ) => (system) => {
@@ -587,14 +582,10 @@ export const save = ( { path, method, ...extras }={} ) => (system) => {
 }
 
 export const getHistory = ({ path, method, ...extras }={}) => async () => {
-  const { tagId } = extras
-  const SwaggerApi = Axios.create({
-    baseURL: "http://localhost:3000/swagger",
-    timeout: 180000,
-  });
+  const { serverUrl } = extras
+  let result = []
 
-  let result = {}
-  await SwaggerApi.get(`/${tagId}`)
+  await Axios.get(serverUrl)
   .then(({ data }) => {
     result = data
   })

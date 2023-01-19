@@ -6,6 +6,7 @@ window.onload = function() {
   const ui = SwaggerUIBundle({
     url: "https://petstore.swagger.io/v2/swagger.json",
     dom_id: "#swagger-ui",
+    historyServerUrl: 'http://localhost:3000/swagger',
     presets: [
       SwaggerUIBundle.presets.apis,
       SwaggerUIStandalonePreset

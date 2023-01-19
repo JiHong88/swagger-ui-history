@@ -2,7 +2,7 @@ import React from "react"
 import PropTypes from "prop-types"
 import Axios from "axios"
 
-export default class HistoryPopup extends React.Component {
+export default class ParamsSavePopup extends React.Component {
   static propTypes = {
     tagId: PropTypes.string.isRequired,
     specActions: PropTypes.object.isRequired,
@@ -11,6 +11,7 @@ export default class HistoryPopup extends React.Component {
     method: PropTypes.string.isRequired,
     onExecute: PropTypes.func,
     onClickClose: PropTypes.object.isRequired,
+    getConfigs: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -44,7 +45,6 @@ export default class HistoryPopup extends React.Component {
   }
 
   onSave = () => {
-    const tagId = this.props.tagId;
     const name = this.state.name;
     if (!name) {
       this.setState({
@@ -55,13 +55,16 @@ export default class HistoryPopup extends React.Component {
 
     this.close();
 
-    let { specActions, operation, path, method } = this.props
+    const { specActions, operation, path, method, tagId, getConfigs } = this.props
+    const { historyServerUrl } = getConfigs()
+    const serverUrl = `${historyServerUrl}/${tagId}`
+
     if (this.props.onExecute) {
       // loading spinner
       this.props.onExecute()
     }
     
-    specActions.save({ operation, path, method, tagId, name })
+    specActions.save({ operation, path, method, serverUrl, name })
   }
 
   render() {
