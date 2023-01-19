@@ -586,6 +586,25 @@ export const save = ( { path, method, ...extras }={} ) => (system) => {
   })
 }
 
+export const getHistory = ({ path, method, ...extras }={}) => async () => {
+  const { tagId } = extras
+  const SwaggerApi = Axios.create({
+    baseURL: "http://localhost:3000/swagger",
+    timeout: 180000,
+  });
+
+  let result = {}
+  await SwaggerApi.get(`/${tagId}`)
+  .then(({ data }) => {
+    result = data
+  })
+  .catch(err => {
+    console.log("[get history fail]", err)
+  })
+
+  return result
+}
+
 export function clearResponse (path, method) {
   return {
     type: CLEAR_RESPONSE,

@@ -17,20 +17,11 @@ export default class HistoryPopup extends React.Component {
     }
   }
 
-  componentDidMount() {
-    const SwaggerApi = Axios.create({
-      baseURL: "http://localhost:3000/swagger",
-      timeout: 180000,
-    });
-  
-    SwaggerApi.get(`/${this.props.tagId}`)
-    .then(({ data }) => {
-      this.setState({
-        stack: data || []
-      })
-    })
-    .catch(err => {
-      console.log("[get history fail]", err)
+  async componentDidMount() {
+    const { specActions, tagId } = this.props
+    const stack = await specActions.getHistory({ tagId })
+    this.setState({
+      stack: stack || []
     })
   }
 
