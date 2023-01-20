@@ -57,10 +57,10 @@ export default class HistoryPopup extends React.Component {
                     this.state.stack.length > 0 ? 
                     this.state.stack.map((v) => {
                       return (
-                        <div key={`history-stack-${v.id}`} className={`opblock opblock`}>
-                          <div key={v.id} className={`opblock-summary opblock-summary`} >
+                        <div key={`history-stack-${v.id}`} className={`opblock`}>
+                          <div className={`opblock-summary`} >
                             <button
-                              className="opblock-summary-control"
+                              className="btn opblock-summary-control"
                               onClick={()=>this.onClickStack(v)}
                             >
                               <div className="opblock-summary-description">

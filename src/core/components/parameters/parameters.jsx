@@ -51,7 +51,7 @@ export default class Parameters extends Component {
 
   onChange = (param, value, isXml, isHistory) => {
     if (!isHistory) {
-      this.state.historyParams[param.get('name')] = ''
+      this.state.historyParams[param.get('name')] = null
     }
 
     let {

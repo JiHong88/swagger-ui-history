@@ -270,10 +270,10 @@ export default class ParameterRow extends Component {
     }
 
     // Force call onChange when there is historyParam
-    if (historyParam) {
+    if (historyParam || typeof historyParam === ('string'|| 'number')) {
       setTimeout(()=>{
         let { onChange, rawParam } = this.props
-        onChange(rawParam, value = historyParam, !!historyParam.isXml, true)
+        onChange(rawParam, value = historyParam, false, true)
       })
     }
 

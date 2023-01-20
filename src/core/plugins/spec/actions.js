@@ -532,6 +532,11 @@ export const saveRequest = (req) =>
         })
     }
 
+    const params = {};
+    Object.entries(req.parameters).forEach(([key, value]) => {
+      params[key.replace(/^.+\./, '')] = value ?? '';
+    });
+
     const requestHeader = {}
     if (oas3Selectors.requestContentType(pathName, method) === "multipart/form-data") {
       requestHeader["Content-Type"] = "multipart/form-data";
@@ -545,7 +550,7 @@ export const saveRequest = (req) =>
         scheme: req.scheme, 
         pathName: req.pathName, 
         method: req.method, 
-        params: req.parameters 
+        params: params
       },
       { 
         headers: requestHeader 

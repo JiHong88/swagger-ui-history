@@ -1,4 +1,7 @@
 .history-popup {
+    .btn {
+        border-radius: 4px !important;
+    }
     .opblock-summary {
         padding: .4rem;
         border-bottom: none !important;
@@ -9,6 +12,12 @@
     .history-name {
         width: 100%;
         max-width: 100%;
+    }
+    .opblock-summary {
+        padding: 0;
+        .opblock-summary-control {
+            padding: 6px;
+        }
     }
 }
 
