@@ -13,6 +13,7 @@ export default class Operation extends PureComponent {
     super(props)
     this.state = {
       savePopup: false,
+      historySaveStatus: ''
     }
   }
 
@@ -52,7 +53,14 @@ export default class Operation extends PureComponent {
     summary: ""
   }
 
+  onExecuteHistory(status) {
+    this.setState({
+      historySaveStatus: status
+    })
+  }
+
   render() {
+    const { historySaveStatus } = this.state
     let {
       specPath,
       response,
@@ -215,6 +223,28 @@ export default class Operation extends PureComponent {
                 </div>
               }
 
+              {
+                historySaveStatus && 
+                <div className={`validation-errors errors-wrapper errors-history-${historySaveStatus}`}>
+                  {
+                    historySaveStatus === 'fail' 
+                    ? 
+                    <>
+                      <span>Save failed. Please check historyServerUrl</span><br/><br/>
+                      **Possible Reasons:**<br/>
+                      - CORS<br/>
+                      - Network Failure<br/>
+                      - URL scheme must be "http" or "https" for CORS request.
+                    </>
+                    :
+                    <>
+                      Save success!
+                    </>
+                  }
+                  
+                </div>
+              }
+
             <div className={(!tryItOutEnabled || !response || !allowTryItOut) ? "execute-wrapper" : "btn-group"}>
               { !tryItOutEnabled || !allowTryItOut ? null :
 
@@ -227,7 +257,8 @@ export default class Operation extends PureComponent {
                     path={ path }
                     method={ method }
                     onExecute={ onExecute }
-                    disabled={executeInProgress}/>
+                    disabled={executeInProgress}
+                    onExecuteHistory = { () => this.onExecuteHistory() }/>
               }
 
               { (!historyServerUrl || !tryItOutEnabled || !response || !allowTryItOut) ? null :
@@ -245,6 +276,7 @@ export default class Operation extends PureComponent {
                   path={ path }
                   method={ method }
                   onExecute={ onExecute }
+                  onExecuteHistory= { (status) => this.onExecuteHistory(status) }
                   onClickClose={ () => this.setState({savePopup: !this.state.savePopup}) }
                   getConfigs={getConfigs}/>
               }
@@ -253,7 +285,8 @@ export default class Operation extends PureComponent {
                   <Clear
                     specActions={ specActions }
                     path={ path }
-                    method={ method }/>
+                    method={ method }
+                    onExecuteHistory = { () => this.onExecuteHistory() }/>
               }
             </div>
 

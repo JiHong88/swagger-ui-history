@@ -12,7 +12,8 @@ export default class Execute extends Component {
     oas3Selectors: PropTypes.object.isRequired,
     oas3Actions: PropTypes.object.isRequired,
     onExecute: PropTypes.func,
-    disabled: PropTypes.bool
+    disabled: PropTypes.bool,
+    onExecuteHistory: PropTypes.func.isRequired,
   }
 
   handleValidateParameters = () => {
@@ -88,6 +89,7 @@ export default class Execute extends Component {
     let requestBodyResult = this.handleValidateRequestBody()
     let isPass = paramsResult && requestBodyResult
     this.handleValidationResult(isPass)
+    this.props.onExecuteHistory()
   }
 
   onChangeProducesWrapper = ( val ) => this.props.specActions.changeProducesValue([this.props.path, this.props.method], val)

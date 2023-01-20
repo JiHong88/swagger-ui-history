@@ -29,6 +29,7 @@ export const UPDATE_OPERATION_META_VALUE = "spec_update_operation_meta_value"
 export const UPDATE_RESOLVED = "spec_update_resolved"
 export const UPDATE_RESOLVED_SUBTREE = "spec_update_resolved_subtree"
 export const SET_SCHEME = "set_scheme"
+export const UPDATE_HISTORY_SAVE_STATUS = "set_history_save_status"
 
 const toStr = (str) => isString(str) ? str : ""
 
@@ -371,6 +372,13 @@ export const logRequest = (req) => {
   }
 }
 
+export const setHistorySaveStatus = ( status ) => {
+  return {
+    payload: status,
+    type: UPDATE_HISTORY_SAVE_STATUS
+  }
+}
+
 // Actually fire the request via fn.execute
 // (For debugging) and ease of testing
 export const executeRequest = (req) =>
@@ -511,7 +519,7 @@ export const execute = ( { path, method, ...extras }={} ) => (system) => {
 }
 
 export const saveRequest = (req) =>
-  ({specActions, specSelectors, oas3Selectors }) => {
+  async ({specActions, specSelectors, oas3Selectors }) => {
     let { pathName, method, operation, serverUrl, name } = req
 
     if (operation && operation.get("parameters")) {
@@ -542,7 +550,8 @@ export const saveRequest = (req) =>
       requestHeader["Content-Type"] = "multipart/form-data";
     }
 
-    Axios.post(
+    let status = 'success';
+    await Axios.post(
       serverUrl, 
       { 
         id: uuidv4(),
@@ -566,7 +575,10 @@ export const saveRequest = (req) =>
       specActions.setResponse(req.pathName, req.method, {
         error: true, err: serializeError(err)
       })
+      status = 'fail'
     })
+
+    return status;
   }
 
 export const save = ( { path, method, ...extras }={} ) => (system) => {

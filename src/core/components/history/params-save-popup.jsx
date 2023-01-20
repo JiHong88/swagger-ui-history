@@ -12,6 +12,7 @@ export default class ParamsSavePopup extends React.Component {
     onExecute: PropTypes.func,
     onClickClose: PropTypes.object.isRequired,
     getConfigs: PropTypes.func.isRequired,
+    onExecuteHistory: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -55,7 +56,7 @@ export default class ParamsSavePopup extends React.Component {
 
     this.close();
 
-    const { specActions, operation, path, method, tagId, getConfigs } = this.props
+    const { specActions, operation, path, method, tagId, getConfigs, onExecuteHistory } = this.props
     const { historyServerUrl } = getConfigs()
     const serverUrl = `${historyServerUrl}/${tagId}`
 
@@ -64,7 +65,7 @@ export default class ParamsSavePopup extends React.Component {
       this.props.onExecute()
     }
     
-    specActions.save({ operation, path, method, serverUrl, name })
+    specActions.save({ operation, path, method, serverUrl, name }).then(status => onExecuteHistory(status))
   }
 
   render() {

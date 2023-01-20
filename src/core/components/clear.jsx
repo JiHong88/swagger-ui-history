@@ -4,9 +4,10 @@ import PropTypes from "prop-types"
 export default class Clear extends Component {
 
   onClick =() => {
-    let { specActions, path, method } = this.props
+    let { specActions, path, method, onExecuteHistory } = this.props
     specActions.clearResponse( path, method )
     specActions.clearRequest( path, method )
+    onExecuteHistory()
   }
 
   render(){
@@ -21,5 +22,6 @@ export default class Clear extends Component {
     specActions: PropTypes.object.isRequired,
     path: PropTypes.string.isRequired,
     method: PropTypes.string.isRequired,
+    onExecuteHistory: PropTypes.func.isRequired,
   }
 }

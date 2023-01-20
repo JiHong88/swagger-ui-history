@@ -37,3 +37,15 @@
 
     }
 }
+
+.validation-errors.errors-wrapper {
+    &.errors-history-success {
+        border-color: #7b60ff;
+        background: rgba(249, 62, 246, 0.1);
+    }
+    &.errors-history-fail {
+        span {
+            color: #ff5b5b;
+        }
+    }
+}
